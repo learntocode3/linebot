@@ -11,6 +11,7 @@ from linebot.models import (
 )
 from model.settings import SECRET_KEY, CHANNEL_ACCESS_TOKEN, CHANNEL_SECRET
 from model import db
+from scraper import Ifoodie
 
 app = Flask(__name__)
 app.secret_key=SECRET_KEY
@@ -41,10 +42,15 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=event.message.text))
+    msg = event.message.text # what user sends to me
+    
+    if msg in ['restaurant', 'Restaurant', '餐廳推薦', '推薦餐廳']:
+        recommend_res = Ifoodie('台中市')
+        reply = recommend_res.scrape()    
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=reply))
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0")
