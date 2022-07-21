@@ -1,6 +1,5 @@
 import mysql.connector
 from mysql.connector import errorcode
-import json
 from model.settings import USER_TEST, PASSWORD
 
 class linebotDB():
@@ -8,7 +7,7 @@ class linebotDB():
         try:
             cnx = mysql.connector.connect(user=USER_TEST,
                                           password=PASSWORD,
-                                          database='summerShredding')
+                                          database='linebot')
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
@@ -18,3 +17,32 @@ class linebotDB():
                 print(err)
         else:
             print("database connect success")
+            cnx.close()
+
+    def set_user(self, usr_id, img_id):
+        cnx = mysql.connector.connect(user=USER_TEST,
+                                          password=PASSWORD,
+                                          database='linebot')
+        cursor = cnx.cursor()
+        add_img = ("INSERT INTO member "
+                   "(user_id, image_id) " 
+                   "VALUES (%s, %s)")
+        data_member = (usr_id, img_id)
+        cursor.execute(add_img, data_member)
+        cnx.commit()
+        print("insert usr and img success!")
+        cursor.close()
+        cnx.close()
+
+    def get_user(self, usr_id):
+        cnx = mysql.connector.connect(user=USER_TEST,
+                                          password=PASSWORD,
+                                          database='linebot')
+        cursor = cnx.cursor()
+        query = ("SELECT image_id FROM member WHERE user_id = %s")
+        data_member = (usr_id,)
+        cursor.execute(query, data_member)
+        img_name = cursor.fetchone()
+        cursor.close()
+        cnx.close()
+        return img_name[0]

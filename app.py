@@ -45,7 +45,7 @@ def handle_message(event):
     msg = event.message.text # what user sends to me
     
     if msg in ['restaurant', 'Restaurant', '餐廳推薦', '推薦餐廳']:
-        recommend_res = Ifoodie('台中市')
+        recommend_res = Ifoodie()
         reply = recommend_res.scrape()    
         line_bot_api.reply_message(
             event.reply_token,
