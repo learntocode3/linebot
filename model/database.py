@@ -3,8 +3,6 @@ from mysql.connector import errorcode
 import json
 from settings import USER_TEST, PASSWORD
 
-# print(USER,PASSWORD)
-
 # connect to mysql
 DB_NAME = 'linebot'
 cnx = mysql.connector.connect(user=USER_TEST,
@@ -41,7 +39,8 @@ TABLES = {}
 TABLES['member'] = (
     "CREATE TABLE `member` ("
     "  `user_id` VARCHAR(255) NOT NULL,"
-    "  `image_id` VARCHAR(255) NOT NULL"
+    "  `image_id` VARCHAR(255) NOT NULL,"
+    "  PRIMARY KEY (`user_id`)"
     ") ENGINE=InnoDB")
 
 for table_name in TABLES:

@@ -7,12 +7,13 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,
+    MessageEvent, TextMessage, TextSendMessage, ImageSendMessage
 )
-from model.settings import SECRET_KEY, CHANNEL_ACCESS_TOKEN, CHANNEL_SECRET
+from model.settings import SECRET_KEY, CHANNEL_ACCESS_TOKEN, CHANNEL_SECRET, NGROK_URL
 from model import db
 from scraper import Ifoodie
 
+ngrok_url = NGROK_URL
 app = Flask(__name__)
 app.secret_key=SECRET_KEY
 botDB = db.linebotDB()
@@ -40,16 +41,40 @@ def callback():
     return 'OK'
 
 
-@handler.add(MessageEvent, message=TextMessage)
+@handler.add(MessageEvent)
 def handle_message(event):
-    msg = event.message.text # what user sends to me
+    UserId = event.source.user_id
+    messageType = event.message.type
+
+    if messageType == "image":
+        botDB.set_userId_imageId(UserId, event.message.id)
+
+        SendImage = line_bot_api.get_message_content(event.message.id)
+        path = './static/' + event.message.id + '.png'
+        with open(path, 'wb') as fd:
+            for chenk in SendImage.iter_content():
+                fd.write(chenk)
+
+
+    if messageType == "text":
+        if event.message.text == "wwwww":
+            imgId = botDB.get_user(UserId)
+            line_bot_api.reply_message(event.reply_token, ImageSendMessage(original_content_url = ngrok_url + "/static/" + imgId + ".png", preview_image_url = ngrok_url + "/static/" + imgId + ".png"))
+
+    # if botDB.get_user(UserId) == "No User":
+    #     botDB.set_userId_imageId(UserId)
+    # else:
+    #     print("YIYIYI")
     
-    if msg in ['restaurant', 'Restaurant', '餐廳推薦', '推薦餐廳']:
-        recommend_res = Ifoodie()
-        reply = recommend_res.scrape()    
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=reply))
+    print('使用者id:',UserId)
+    
+    if messageType == "text":
+        if event.message.text in ['restaurant', 'Restaurant', '餐廳推薦', '推薦餐廳']:
+            recommend_res = Ifoodie()
+            reply = recommend_res.scrape()    
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=reply))
 
 
 if __name__ == "__main__":

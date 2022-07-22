@@ -19,15 +19,15 @@ class linebotDB():
             print("database connect success")
             cnx.close()
 
-    def set_user(self, usr_id, img_id):
+    def set_userId_imageId(self, usr_id, img_id):
         cnx = mysql.connector.connect(user=USER_TEST,
                                           password=PASSWORD,
                                           database='linebot')
         cursor = cnx.cursor()
         add_img = ("INSERT INTO member "
                    "(user_id, image_id) " 
-                   "VALUES (%s, %s)")
-        data_member = (usr_id, img_id)
+                   "VALUES (%s, %s)ON DUPLICATE KEY UPDATE image_id=%s")
+        data_member = (usr_id, img_id, img_id)
         cursor.execute(add_img, data_member)
         cnx.commit()
         print("insert usr and img success!")
@@ -45,4 +45,7 @@ class linebotDB():
         img_name = cursor.fetchone()
         cursor.close()
         cnx.close()
-        return img_name[0]
+        if img_name:
+            return img_name[0]
+        
+        return "No User"
