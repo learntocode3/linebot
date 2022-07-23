@@ -48,34 +48,34 @@ def handle_message(event):
 
     if messageType == "image":
         botDB.set_userId_imageId(UserId, event.message.id)
-
+        
+        #Save the image to local
         SendImage = line_bot_api.get_message_content(event.message.id)
         path = './static/' + event.message.id + '.png'
         with open(path, 'wb') as fd:
             for chenk in SendImage.iter_content():
                 fd.write(chenk)
 
-
-    if messageType == "text":
-        if event.message.text == "wwwww":
+    elif messageType == "text":
+        if event.message.text == "回傳圖片":
             imgId = botDB.get_user(UserId)
-            line_bot_api.reply_message(event.reply_token, ImageSendMessage(original_content_url = ngrok_url + "/static/" + imgId + ".png", preview_image_url = ngrok_url + "/static/" + imgId + ".png"))
-
-    # if botDB.get_user(UserId) == "No User":
-    #     botDB.set_userId_imageId(UserId)
-    # else:
-    #     print("YIYIYI")
-    
-    print('使用者id:',UserId)
-    
-    if messageType == "text":
-        if event.message.text in ['restaurant', 'Restaurant', '餐廳推薦', '推薦餐廳']:
-            recommend_res = Ifoodie()
-            reply = recommend_res.scrape()    
-            line_bot_api.reply_message(
+            if imgId == "No User":
+                line_bot_api.reply_message(
                 event.reply_token,
-                TextSendMessage(text=reply))
-
+                TextSendMessage(text="Please send an image first"))
+            else:
+                line_bot_api.reply_message(event.reply_token, ImageSendMessage(original_content_url = ngrok_url + "/static/" + imgId + ".png", preview_image_url = ngrok_url + "/static/" + imgId + ".png"))
+       
+        elif event.message.text in ['restaurant', 'Restaurant', '餐廳推薦', '推薦餐廳']:
+                recommend_res = Ifoodie()
+                reply = recommend_res.scrape()    
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text=reply))
+        else:
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=event.message.text))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")

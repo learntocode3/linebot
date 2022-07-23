@@ -1,6 +1,5 @@
 import mysql.connector
 from mysql.connector import errorcode
-import json
 from settings import USER_TEST, PASSWORD
 
 # connect to mysql
@@ -30,6 +29,8 @@ except mysql.connector.Error as err:
         print(err)
         exit(1)
 
+
+# create table
 cnx = mysql.connector.connect(user=USER_TEST,
                               password=PASSWORD,
                               auth_plugin='mysql_native_password')

@@ -47,5 +47,4 @@ class linebotDB():
         cnx.close()
         if img_name:
             return img_name[0]
-        
         return "No User"
