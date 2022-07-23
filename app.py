@@ -43,11 +43,11 @@ def callback():
 
 @handler.add(MessageEvent)
 def handle_message(event):
-    UserId = event.source.user_id
+    userId = event.source.user_id
     messageType = event.message.type
 
     if messageType == "image":
-        botDB.set_userId_imageId(UserId, event.message.id)
+        botDB.set_userId_imageId(userId, event.message.id)
         
         #Save the image to local
         SendImage = line_bot_api.get_message_content(event.message.id)
@@ -58,7 +58,7 @@ def handle_message(event):
 
     elif messageType == "text":
         if event.message.text == "回傳圖片":
-            imgId = botDB.get_user(UserId)
+            imgId = botDB.get_user(userId)
             if imgId == "No User":
                 line_bot_api.reply_message(
                 event.reply_token,
